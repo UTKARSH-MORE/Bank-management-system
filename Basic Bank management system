@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank Account Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('https://img.freepik.com/premium-vector/banking-finance-concept-illustration_387612-169.jpg?semt=ais_hybrid'); /* Replace with your image URL */
+            background-size: cover;
+            background-position: center;
+            margin: 0;
+            padding: 20px;
+            color: white;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: rgba(255, 255, 255, 0.8); /* Semi-transparent white background */
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #333; /* Dark text for headings */
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            color: #333; /* Dark text for labels */
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            padding: 10px;
+            width: 100%;
+            margin: 5px 0;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #message {
+            color: red;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bank Account Management</h1>
+        <div>
+            <label for="holderName">Account Holder Name:</label>
+            <input type="text" id="holderName">
+        </div>
+        <div>
+            <label for="accountNumber">Account Number:</label>
+            <input type="text" id="accountNumber">
+        </div>
+        <div>
+            <label for="initialBalance">Initial Balance:</label>
+            <input type="number" id="initialBalance" step="0.01" min="0">
+        </div>
+        <button id="createAccount">Create Account</button>
+
+        <div id="accountDetails" class="hidden">
+            <h2>Account Details</h2>
+            <p id="details"></p>
+            <button id="depositBtn">Deposit</button>
+            <button id="withdrawBtn">Withdraw</button>
+        </div>
+
+        <div id="transactionSection" class="hidden">
+            <div>
+                <label for="amount">Amount:</label>
+                <input type="number" id="amount" step="0.01" min="0">
+            </div>
+            <button id="submitTransaction">Submit</button>
+        </div>
+
+        <div id="message" class="hidden"></div>
+    </div>
+    <script>
+        let account = null;
+
+        document.getElementById('createAccount').addEventListener('click', function() {
+            const holderName = document.getElementById('holderName').value;
+            const accountNumber = document.getElementById('accountNumber').value;
+            const initialBalance = parseFloat(document.getElementById('initialBalance').value);
+
+            if (!holderName || !accountNumber || isNaN(initialBalance) || initialBalance < 0) {
+                showMessage("Please enter valid account details.");
+                return;
+            }
+
+            account = {
+                holderName: holderName,
+                accountNumber: accountNumber,
+                balance: initialBalance
+            };
+
+            document.getElementById('details').innerText = `Account Holder: ${account.holderName}, Account Number: ${account.accountNumber}, Balance: $${account.balance.toFixed(2)}`;
+            document.getElementById('accountDetails').classList.remove('hidden');
+            document.getElementById('transactionSection').classList.remove('hidden');
+            document.getElementById('message').classList.add('hidden');
+        });
+
+        document.getElementById('depositBtn').addEventListener('click', function() {
+            const amount = parseFloat(document.getElementById('amount').value);
+            if (amount > 0) {
+                account.balance += amount;
+                showMessage(`Successfully deposited $${amount.toFixed(2)}`);
+                updateAccountDetails();
+            } else {
+                showMessage("Deposit amount must be greater than zero.");
+            }
+        });
+
+        document.getElementById('withdrawBtn').addEventListener('click', function() {
+            const amount = parseFloat(document.getElementById('amount').value);
+            if (amount > 0 && amount <= account.balance) {
+                account.balance -= amount;
+                showMessage(`Successfully withdrew $${amount.toFixed(2)}`);
+                updateAccountDetails();
+            } else {
+                showMessage("Insufficient balance or invalid amount.");
+            }
+        });
+
+        document.getElementById('submitTransaction').addEventListener('click', function() {
+            // Trigger deposit or withdrawal based on which button was clicked
+            const depositActive = document.getElementById('depositBtn').classList.contains('active');
+            const withdrawActive = document.getElementById('withdrawBtn').classList.contains('active');
+            
+            if (depositActive) {
+                document.getElementById('depositBtn').click();
+            } else if (withdrawActive) {
+                document.getElementById('withdrawBtn').click();
+            }
+        });
+
+        function updateAccountDetails() {
+            document.getElementById('details').innerText = `Account Holder: ${account.holderName}, Account Number: ${account.accountNumber}, Balance: $${account.balance.toFixed(2)}`;
+        }
+
+        function showMessage(msg) {
+            const messageElement = document.getElementById('message');
+            messageElement.innerText = msg;
+            messageElement.classList.remove('hidden');
+            setTimeout(() => {
+                messageElement.classList.add('hidden');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
